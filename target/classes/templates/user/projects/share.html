@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  templates/user/projects/share.html
+  Share a project with teammates
+-->
+
+<head th:replace="~{fragments/layout :: head('Share Project')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!-- Page header -->
+    <div class="page-header">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.4rem;">
+            <a th:href="@{/user/projects}"
+               style="color:var(--text-secondary); text-decoration:none;">Projects</a>
+            &rsaquo;
+            <span th:text="${project.name}">Project</span>
+        </p>
+        <h1>Share Project</h1>
+        <p>Invite teammates to collaboratively edit use cases and CRC cards</p>
+    </div>
+
+    <!-- Flash messages -->
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger"  th:if="${errorMessage}"   th:text="${errorMessage}"></div>
+
+    <!-- ---------------------------------------------------------------
+      Section 1: Current collaborators
+    --------------------------------------------------------------- -->
+    <div class="card" style="margin-bottom:1.5rem;">
+        <h2 style="font-family:var(--font-mono); font-size:1rem; font-weight:700;
+                    color:var(--text-primary); margin-bottom:1rem;">
+            Current Collaborators
+        </h2>
+
+        <!-- Empty state: no shares yet -->
+        <div th:if="${#lists.isEmpty(shares)}"
+             style="font-size:0.875rem; color:var(--text-muted); padding:0.5rem 0;">
+            This project has not been shared with anyone yet.
+        </div>
+
+        <!-- Collaborator list -->
+        <div th:unless="${#lists.isEmpty(shares)}"
+             style="display:flex; flex-direction:column; gap:0.75rem;">
+
+            <!--
+              th:each iterates the List<ProjectShare>.
+              Each share gives us share.sharedWith (the User) and share.id.
+            -->
+            <div th:each="share : ${shares}"
+                 style="display:flex; align-items:center; justify-content:space-between;
+                        padding:0.75rem 1rem; background:var(--bg-input);
+                        border:1px solid var(--border); border-radius:8px;">
+
+                <div>
+                    <span style="font-weight:600; color:var(--text-primary);"
+                          th:text="${share.sharedWith.firstName + ' ' + share.sharedWith.lastName}">
+                        Full Name
+                    </span>
+                    <span style="font-size:0.8rem; color:var(--text-muted); margin-left:0.5rem;"
+                          th:text="'@' + ${share.sharedWith.username}">
+                        @username
+                    </span>
+                </div>
+
+                <!--
+                  Remove button: links to /share/{shareId}/remove
+                  Only the project owner sees this page, so the button is always shown.
+                -->
+                <a class="btn btn-danger btn-sm"
+                   th:href="@{/user/projects/{pId}/share/{sId}/remove(pId=${project.id}, sId=${share.id})}"
+                   onclick="return confirm('Remove this collaborator?')">
+                    Remove
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+      Section 2: Add new collaborator form
+    --------------------------------------------------------------- -->
+    <div class="card" style="max-width:500px;">
+        <h2 style="font-family:var(--font-mono); font-size:1rem; font-weight:700;
+                    color:var(--text-primary); margin-bottom:1rem;">
+            Add Collaborator
+        </h2>
+
+        <!--
+          POST to /share/add with the targetUsername parameter.
+          The controller calls projectShareService.shareProject().
+        -->
+        <form th:action="@{/user/projects/{pId}/share/add(pId=${project.id})}"
+              method="post">
+
+            <div class="form-group">
+                <label class="form-label" for="targetUsername">Username</label>
+                <input class="form-control" type="text" id="targetUsername"
+                       name="targetUsername"
+                       placeholder="Enter the exact username of your teammate"
+                       required/>
+                <small style="font-size:0.75rem; color:var(--text-muted);
+                               margin-top:0.3rem; display:block;">
+                    The user must already have a registered account.
+                </small>
+            </div>
+
+            <div style="display:flex; gap:0.75rem;">
+                <button class="btn btn-primary" type="submit">Share Project</button>
+                <a class="btn btn-ghost"
+                   th:href="@{/user/projects}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Back link -->
+    <div style="margin-top:2rem;">
+        <a class="btn btn-ghost" th:href="@{/user/projects}">← Back to Projects</a>
+    </div>
+
+</div>
+</body>
+</html>

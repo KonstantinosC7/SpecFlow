@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  templates/user/usecases/form.html
+ 
+  HOW CREATE vs EDIT IS DETECTED:
+  - If useCase.id == 0  → new use case (INSERT)   → form action → /save
+  - If useCase.id  > 0  → existing use case (UPDATE) → form action → /update
+-->
+
+<head th:replace="~{fragments/layout :: head('Use Case')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!-- Page header -->
+    <div class="page-header">
+        <!-- Breadcrumb -->
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.4rem;">
+            <a th:href="@{/user/projects}" style="color:var(--text-secondary); text-decoration:none;">Projects</a>
+            &rsaquo;
+            <a th:href="@{/user/projects/{pId}/usecases(pId=${project.id})}"
+               style="color:var(--text-secondary); text-decoration:none;"
+               th:text="${project.name}">Project</a>
+            &rsaquo;
+            <span th:text="${useCase.id == 0} ? 'New Use Case' : 'Edit Use Case'">Use Case</span>
+        </p>
+        <h1 th:text="${useCase.id == 0} ? 'New Use Case' : 'Edit Use Case'">Use Case</h1>
+        <p th:text="${useCase.id == 0}
+                    ? 'Define a new use case for this project'
+                    : 'Update the use case definition'"></p>
+    </div>
+
+    <div class="card" style="max-width:720px;">
+
+        <form th:action="${useCase.id == 0}
+                          ? @{/user/projects/{pId}/usecases/save(pId=${project.id})}
+                          : @{/user/projects/{pId}/usecases/update(pId=${project.id})}"
+              th:object="${useCase}"
+              method="post">
+
+            <!-- HIDDEN: preserves the id for UPDATE operations -->
+            <input type="hidden" th:field="*{id}"/>
+
+            <!-- Use Case Name -->
+            <div class="form-group">
+                <label class="form-label" for="name">Use Case Name *</label>
+                <input class="form-control" type="text" id="name"
+                       th:field="*{name}" required/>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label class="form-label" for="description">Brief Description</label>
+                <textarea class="form-control" id="description"
+                          th:field="*{description}"
+                          rows="2"></textarea>
+            </div>
+
+            <!--
+              Actors field — plain input, NOT th:field.
+              The value comes from the "actorsInput" model attribute (a String).
+              The name attribute must be "actorsInput" to match the
+              @RequestParam("actorsInput") in the controller.
+            -->
+            <div class="form-group">
+                <label class="form-label" for="actorsInput">Actors</label>
+                <input class="form-control" type="text" id="actorsInput"
+                       name="actorsInput"
+                       th:value="${actorsInput}"
+                       placeholder="Enter actor names separated by commas."/>
+            </div>
+
+            <!-- Preconditions -->
+            <div class="form-group">
+                <label class="form-label" for="preconditions">Preconditions</label>
+                <textarea class="form-control" id="preconditions"
+                          th:field="*{preconditions}"
+                          rows="3"></textarea>
+            </div>
+
+            <!-- Main Flow -->
+            <div class="form-group">
+                <label class="form-label" for="mainFlow">Main Flow of Events *</label>
+                <textarea class="form-control" id="mainFlow"
+                          th:field="*{mainFlow}"
+                          rows="5"></textarea>
+            </div>
+
+            <!-- Alternative Flow -->
+            <div class="form-group">
+                <label class="form-label" for="alternativeFlow">Alternative / Exception Flow</label>
+                <textarea class="form-control" id="alternativeFlow"
+                          th:field="*{alternativeFlow}"
+                          rows="4"></textarea>
+            </div>
+
+            <!-- Postconditions -->
+            <div class="form-group">
+                <label class="form-label" for="postconditions">Postconditions</label>
+                <textarea class="form-control" id="postconditions"
+                          th:field="*{postconditions}"
+                          rows="3"></textarea>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+                <button class="btn btn-primary" type="submit"
+                        th:text="${useCase.id == 0} ? 'Create Use Case' : 'Save Changes'">
+                    Save
+                </button>
+                <a class="btn btn-ghost"
+                   th:href="@{/user/projects/{pId}/usecases(pId=${project.id})}">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

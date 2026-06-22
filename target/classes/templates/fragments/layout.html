@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!--
+  layout.html — Thymeleaf fragment library
+  All pages include the navbar fragment from here using:
+    th:replace="~{fragments/layout :: navbar}"
+-->
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' — ReqApp'">ReqApp</title>
+    <style>
+        /* ================================================================
+           DESIGN SYSTEM — CSS Variables
+           Dark slate theme with amber accent for a professional dev tool feel
+        ================================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-primary:    #0f1117;
+            --bg-secondary:  #181c27;
+            --bg-card:       #1e2235;
+            --bg-input:      #252a3a;
+            --border:        #2e3450;
+            --border-hover:  #4a5280;
+            --accent:        #f5a623;
+            --accent-hover:  #e8920a;
+            --accent-muted:  rgba(245,166,35,0.12);
+            --text-primary:  #e8eaf2;
+            --text-secondary:#8890b0;
+            --text-muted:    #555f80;
+            --danger:        #e05263;
+            --danger-muted:  rgba(224,82,99,0.12);
+            --success:       #3ecf8e;
+            --success-muted: rgba(62,207,142,0.12);
+            --radius:        8px;
+            --radius-lg:     14px;
+            --shadow:        0 4px 24px rgba(0,0,0,0.4);
+            --font-mono:     'Space Mono', monospace;
+            --font-sans:     'DM Sans', sans-serif;
+            --transition:    all 0.18s ease;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ---- Navbar ---- */
+        .navbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .navbar-brand span { color: var(--text-secondary); }
+        .navbar-nav { display: flex; align-items: center; gap: 0.25rem; list-style: none; }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-link:hover { color: var(--text-primary); background: var(--bg-card); }
+        .nav-link.active { color: var(--accent); }
+        .nav-separator { width: 1px; height: 20px; background: var(--border); margin: 0 0.5rem; }
+
+        /* ---- Page Container ---- */
+        .page-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+
+        /* ---- Page Header ---- */
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 {
+            font-family: var(--font-mono);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.35rem;
+        }
+        .page-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* ---- Cards ---- */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: var(--transition);
+        }
+        .card:hover { border-color: var(--border-hover); }
+
+        /* ---- Form Elements ---- */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            margin-bottom: 0.45rem;
+        }
+        .form-control {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            padding: 0.6rem 0.9rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-muted);
+        }
+        textarea.form-control { resize: vertical; min-height: 90px; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-sans);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.55rem 1.25rem;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0f1117;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text-primary); border-color: var(--border-hover); background: var(--bg-card); }
+        .btn-danger {
+            background: var(--danger-muted);
+            color: var(--danger);
+            border: 1px solid transparent;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+
+        /* ---- Alerts ---- */
+        .alert {
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid;
+        }
+        .alert-success { background: var(--success-muted); color: var(--success); border-color: rgba(62,207,142,0.3); }
+        .alert-danger  { background: var(--danger-muted);  color: var(--danger);  border-color: rgba(224,82,99,0.3); }
+
+        /* ---- Empty State ---- */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+        .empty-state h3 { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .empty-state p { font-size: 0.875rem; }
+
+        /* ---- Badge ---- */
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            padding: 0.2rem 0.55rem;
+            border-radius: 99px;
+            background: var(--accent-muted);
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<nav th:fragment="navbar">
+    <nav class="navbar">
+        <a class="navbar-brand" href="/user/dashboard">
+            req<span>/</span>app
+        </a>
+        <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+            <li><a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a></li>
+            <li><a class="nav-link" th:href="@{/user/projects}">Projects</a></li>
+            <li><div class="nav-separator"></div></li>
+            <li><a class="nav-link" th:href="@{/user/profile}">Profile</a></li>
+            <li>
+                <a class="nav-link" th:href="@{/logout}"
+                   style="color:var(--danger)">Logout</a>
+            </li>
+        </ul>
+    </nav>
+</nav>
+
+</html>

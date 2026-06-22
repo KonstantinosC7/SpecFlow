@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  templates/user/usecases/comments.html
+  View and add comments on a use case
+-->
+
+<head th:replace="~{fragments/layout :: head('Comments')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!-- Breadcrumb header -->
+    <div class="page-header">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.4rem;">
+            <a th:href="@{/user/projects}"
+               style="color:var(--text-secondary); text-decoration:none;">Projects</a>
+            &rsaquo;
+            <a th:href="@{/user/projects/{pId}/usecases(pId=${project.id})}"
+               style="color:var(--text-secondary); text-decoration:none;"
+               th:text="${project.name}">Project</a>
+            &rsaquo;
+            <span th:text="${useCase.name}">Use Case</span>
+        </p>
+        <h1>
+            Comments on:
+            <span style="color:var(--accent);" th:text="${useCase.name}">Use Case</span>
+        </h1>
+        <p>Discuss changes and decisions for this use case</p>
+    </div>
+
+    <!-- Flash messages -->
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger"  th:if="${errorMessage}"   th:text="${errorMessage}"></div>
+
+    <!-- ---------------------------------------------------------------
+      Comment thread
+    --------------------------------------------------------------- -->
+    <div style="margin-bottom:2rem;">
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(comments)}"
+             style="font-size:0.875rem; color:var(--text-muted);
+                    background:var(--bg-card); border:1px solid var(--border);
+                    border-radius:8px; padding:2rem; text-align:center;">
+            No comments yet. Be the first to start the discussion.
+        </div>
+
+        <!-- Comments list -->
+        <div th:unless="${#lists.isEmpty(comments)}"
+             style="display:flex; flex-direction:column; gap:0.85rem;">
+
+            <!--
+              th:each iterates the List<Comment>.
+              Each comment shows: author name, timestamp, and text.
+            -->
+            <div class="card" th:each="comment : ${comments}"
+                 style="padding:1rem 1.25rem;">
+
+                <!-- Comment meta: author and timestamp -->
+                <div style="display:flex; align-items:center; gap:0.75rem;
+                            margin-bottom:0.6rem; flex-wrap:wrap;">
+
+                    <!-- Author avatar initials circle -->
+                    <div style="width:32px; height:32px; border-radius:50%;
+                                background:var(--accent-muted); border:1px solid var(--accent);
+                                display:flex; align-items:center; justify-content:center;
+                                font-family:var(--font-mono); font-size:0.7rem;
+                                font-weight:700; color:var(--accent); flex-shrink:0;"
+                         th:text="${#strings.substring(comment.author.firstName,0,1)
+                                   + #strings.substring(comment.author.lastName,0,1)}">
+                        AB
+                    </div>
+
+                    <div>
+                        <span style="font-weight:600; font-size:0.875rem; color:var(--text-primary);"
+                              th:text="${comment.author.firstName + ' ' + comment.author.lastName}">
+                            Author Name
+                        </span>
+                        <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.4rem;"
+                              th:text="'@' + ${comment.author.username}">
+                            @username
+                        </span>
+                    </div>
+
+                    <!-- Timestamp -->
+                    <span style="font-size:0.75rem; color:var(--text-muted); margin-left:auto;"
+                          th:text="${comment.createdAt != null
+                                     ? #temporals.format(comment.createdAt, 'dd MMM yyyy HH:mm')
+                                     : ''}">
+                        Date
+                    </span>
+                </div>
+
+                <!-- Comment text -->
+                <p style="font-size:0.875rem; color:var(--text-secondary); line-height:1.65;
+                           white-space:pre-wrap;"
+                   th:text="${comment.text}">
+                    Comment text here
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+      Add comment form
+    --------------------------------------------------------------- -->
+    <div class="card" style="max-width:640px;">
+        <h2 style="font-family:var(--font-mono); font-size:0.95rem; font-weight:700;
+                    color:var(--text-primary); margin-bottom:1rem;">
+            Add a Comment
+        </h2>
+
+        <!--
+          POST to /usecases/{ucId}/comments/add with the text parameter.
+        -->
+        <form th:action="@{/user/projects/{pId}/usecases/{ucId}/comments/add(pId=${project.id}, ucId=${useCase.id})}"
+              method="post">
+
+            <div class="form-group">
+                <label class="form-label" for="text">Your Comment</label>
+                <textarea class="form-control" id="text" name="text"
+                          rows="4"
+                          required></textarea>
+            </div>
+
+            <div style="display:flex; gap:0.75rem;">
+                <button class="btn btn-primary" type="submit">Post Comment</button>
+                <a class="btn btn-ghost"
+                   th:href="@{/user/projects/{pId}/usecases(pId=${project.id})}">
+                    Back to Use Cases
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

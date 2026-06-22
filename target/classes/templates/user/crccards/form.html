@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  templates/user/crccards/form.html
+
+  HOW CREATE vs EDIT IS DETECTED:
+  - card.id == 0  → new card  → action → /save
+  - card.id  > 0  → edit card → action → /update
+-->
+
+<head th:replace="~{fragments/layout :: head('CRC Card')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!-- Page header with breadcrumb -->
+    <div class="page-header">
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.4rem;">
+            <a th:href="@{/user/projects}"
+               style="color:var(--text-secondary); text-decoration:none;">Projects</a>
+            &rsaquo;
+            <a th:href="@{/user/projects/{pId}/crccards(pId=${project.id})}"
+               style="color:var(--text-secondary); text-decoration:none;"
+               th:text="${project.name}">Project</a>
+            &rsaquo;
+            <span th:text="${card.id == 0} ? 'New CRC Card' : 'Edit CRC Card'">CRC Card</span>
+        </p>
+        <h1 th:text="${card.id == 0} ? 'New CRC Card' : 'Edit CRC Card'">CRC Card</h1>
+        <p th:text="${card.id == 0}
+                    ? 'Define a new domain class '
+                    : 'Update the CRC card'"></p>
+    </div>
+
+    <div class="card" style="max-width:720px;">
+
+        <form th:action="${card.id == 0}
+                          ? @{/user/projects/{pId}/crccards/save(pId=${project.id})}
+                          : @{/user/projects/{pId}/crccards/update(pId=${project.id})}"
+              th:object="${card}"
+              method="post">
+
+            <!-- HIDDEN id — critical for UPDATE -->
+            <input type="hidden" th:field="*{id}"/>
+
+            <!-- Class Name -->
+            <div class="form-group">
+                <label class="form-label" for="className">Class Name *</label>
+                <input class="form-control" type="text" id="className"
+                       th:field="*{className}"
+                       required/>
+            </div>
+
+            <!-- Responsibilities -->
+            <div class="form-group">
+                <label class="form-label" for="responsibilities">Responsibilities</label>
+                <textarea class="form-control" id="responsibilities"
+                          th:field="*{responsibilities}"
+                          rows="4"></textarea>
+            </div>
+
+            <!-- Collaborations -->
+            <div class="form-group">
+                <label class="form-label" for="collaborations">Collaborations</label>
+                <textarea class="form-control" id="collaborations"
+                          th:field="*{collaborations}"
+                          rows="3"></textarea>
+            </div>
+
+            <!-- ---------------------------------------------------------------
+              Link to Use Cases
+              Show all use cases of the project as checkboxes.
+              If useCases list is empty, show a notice instead.
+            --------------------------------------------------------------- -->
+            <div class="form-group">
+                <label class="form-label">Link to Use Cases</label>
+
+                <!-- Notice: no use cases exist yet -->
+                <div th:if="${#lists.isEmpty(useCases)}"
+                     style="font-size:0.85rem; color:var(--text-muted);
+                            background:var(--bg-input); border:1px solid var(--border);
+                            border-radius:8px; padding:0.75rem 1rem;">
+                    No use cases found for this project.
+                    <a th:href="@{/user/projects/{pId}/usecases/new(pId=${project.id})}"
+                       style="color:var(--accent); text-decoration:none; font-weight:600;">
+                        Create one first →
+                    </a>
+                </div>
+
+                <!--
+                  Checkboxes — one per use case.
+                -->
+                <div th:unless="${#lists.isEmpty(useCases)}"
+                     style="display:flex; flex-direction:column; gap:0.5rem;
+                            background:var(--bg-input); border:1px solid var(--border);
+                            border-radius:8px; padding:0.85rem 1rem;">
+
+                    <label th:each="uc : ${useCases}"
+                           style="display:flex; align-items:center; gap:0.6rem;
+                                  font-size:0.875rem; color:var(--text-primary); cursor:pointer;">
+                        <input type="checkbox"
+                               name="linkedUseCaseIds"
+                               th:value="${uc.id}"
+                               th:checked="${linkedIds != null and #lists.contains(linkedIds, uc.id)}"
+                               style="width:15px; height:15px; accent-color:var(--accent); cursor:pointer;"/>
+                        <span th:text="${uc.name}">Use Case Name</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <!-- Submit buttons -->
+            <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+                <button class="btn btn-primary" type="submit"
+                        th:text="${card.id == 0} ? 'Create CRC Card' : 'Save Changes'">
+                    Save
+                </button>
+                <a class="btn btn-ghost"
+                   th:href="@{/user/projects/{pId}/crccards(pId=${project.id})}">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

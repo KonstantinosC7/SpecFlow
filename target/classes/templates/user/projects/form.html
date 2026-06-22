@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Project')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!--
+        - If project.id == 0, it's a new project (no id yet → INSERT).
+        - If project.id > 0, it's an edit (existing id → UPDATE).
+        Thymeleaf's th:if / ternary operator handles the label and action URL.
+    -->
+    <div class="page-header">
+        <h1 th:text="${project.id == 0} ? 'New Project' : 'Edit Project'">Project</h1>
+        <p th:text="${project.id == 0}
+                    ? 'Create a new requirements project'
+                    : 'Update project details'">
+        </p>
+    </div>
+
+    <div class="card" style="max-width:600px">
+
+        <!--
+            th:action: points to /save (new) or /update (edit) based on id.
+            th:object: binds this form to the Project model object.
+        -->
+        <form th:action="${project.id == 0} ? @{/user/projects/save} : @{/user/projects/update}"
+              th:object="${project}"
+              method="post">
+
+            <!-- Hidden id field — critical for UPDATE: tells JPA to update, not insert -->
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="form-group">
+                <label class="form-label" for="name">Project Name *</label>
+                <input class="form-control" type="text" id="name"
+                       th:field="*{name}" required/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" id="description"
+                          th:field="*{description}"
+                          rows="4"></textarea>
+            </div>
+
+            <div style="display:flex;gap:.75rem;margin-top:.5rem">
+                <button class="btn btn-primary" type="submit"
+                        th:text="${project.id == 0} ? 'Create Project' : 'Save Changes'">
+                    Save
+                </button>
+                <a class="btn btn-ghost" th:href="@{/user/projects}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

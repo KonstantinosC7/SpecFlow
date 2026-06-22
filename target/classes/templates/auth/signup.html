@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Register — ReqApp</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+        :root{--bg:#0f1117;--bg-card:#1e2235;--bg-input:#252a3a;--border:#2e3450;--accent:#f5a623;--accent-hover:#e8920a;--accent-muted:rgba(245,166,35,0.12);--text:#e8eaf2;--text-sec:#8890b0;--danger:#e05263;--danger-muted:rgba(224,82,99,0.12);--font-mono:'Space Mono',monospace;--font-sans:'DM Sans',sans-serif}
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:var(--font-sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+        .auth-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:460px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+        .auth-logo{font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--accent);text-decoration:none;display:block;margin-bottom:2rem}
+        .auth-logo span{color:#555f80}
+        h2{font-family:var(--font-mono);font-size:1.25rem;font-weight:700;margin-bottom:.4rem;letter-spacing:-.3px}
+        .auth-sub{color:var(--text-sec);font-size:.875rem;margin-bottom:1.75rem}
+        .row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        .form-group{margin-bottom:1.1rem}
+        .form-label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-sec);margin-bottom:.4rem}
+        .form-control{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-sans);font-size:.9rem;padding:.65rem .9rem;outline:none;transition:all .18s}
+        .form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-muted)}
+        .btn{display:flex;align-items:center;justify-content:center;width:100%;font-family:var(--font-sans);font-size:.9rem;font-weight:600;padding:.7rem 1.25rem;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all .18s;margin-top:.5rem}
+        .btn-primary{background:var(--accent);color:#0f1117}
+        .btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+        .alert{padding:.8rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1.25rem;border:1px solid}
+        .alert-danger{background:var(--danger-muted);color:var(--danger);border-color:rgba(224,82,99,.3)}
+        .auth-footer{text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--text-sec)}
+        .auth-footer a{color:var(--accent);text-decoration:none;font-weight:600}
+        .back-link{display:block;text-align:center;margin-top:1rem;font-size:.8rem;color:var(--text-sec);text-decoration:none}
+        .back-link:hover{color:var(--text)}
+    </style>
+</head>
+<body>
+
+<div class="auth-box">
+    <a class="auth-logo" href="/">req<span>/</span>app</a>
+    <h2>Create account</h2>
+    <p class="auth-sub">Set up your developer workspace</p>
+
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <!--
+        th:action="@{/save}" → posts to AuthController.registerUser()
+        th:object="${user}"  → binds this form to the User model attribute
+        th:field="*{username}" → binds input to user.username
+    -->
+    <form th:action="@{/save}" th:object="${user}" method="post">
+        <div class="row-2">
+            <div class="form-group">
+                <label class="form-label" for="firstName">First name</label>
+                <input class="form-control" type="text" id="firstName"
+                       th:field="*{firstName}" required/>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="lastName">Last name</label>
+                <input class="form-control" type="text" id="lastName"
+                       th:field="*{lastName}"  required/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" type="email" id="email"
+                   th:field="*{email}" required/>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" type="text" id="username"
+                   th:field="*{username}" required/>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" type="password" id="password"
+                   th:field="*{password}" required/>
+        </div>
+        <button class="btn btn-primary" type="submit">Create account →</button>
+    </form>
+
+    <div class="auth-footer">
+        Already have an account? <a th:href="@{/login}">Sign in</a>
+    </div>
+    <a class="back-link" th:href="@{/}">← Back to home</a>
+</div>
+
+</body>
+</html>

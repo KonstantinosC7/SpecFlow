@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--
+  templates/user/projects/list.html
+-->
+
+<head th:replace="~{fragments/layout :: head('Projects')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <div class="page-header page-header-row">
+        <div>
+            <h1>Projects</h1>
+            <p>Manage your requirement projects</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/user/projects/new}">+ New Project</a>
+    </div>
+
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger"  th:if="${errorMessage}"   th:text="${errorMessage}"></div>
+
+    <!-- MY PROJECTS -->
+    <div th:if="${#lists.isEmpty(projects)}" class="card">
+        <div class="empty-state">
+            <div class="icon">📁</div>
+            <h3>No projects yet</h3>
+            <p>Create your first project to start specifying requirements.</p>
+            <a class="btn btn-primary" th:href="@{/user/projects/new}"
+               style="margin-top:1.25rem; display:inline-flex;">
+                + Create first project
+            </a>
+        </div>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(projects)}"
+         style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:1.25rem;
+                margin-bottom:2.5rem;">
+
+        <div class="card" th:each="project : ${projects}"
+             style="display:flex; flex-direction:column; gap:1rem;">
+
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;">
+                <div>
+                    <h3 style="font-family:var(--font-mono); font-size:1rem; font-weight:700;
+                                color:var(--text-primary); letter-spacing:-.3px;"
+                        th:text="${project.name}">Project Name</h3>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:.2rem;"
+                       th:text="${project.createdAt != null
+                                  ? #temporals.format(project.createdAt, 'dd MMM yyyy') : ''}">
+                        Date
+                    </p>
+                </div>
+                <span class="badge">owner</span>
+            </div>
+
+            <p style="font-size:.875rem; color:var(--text-secondary); flex:1; line-height:1.6;"
+               th:text="${project.description != null and !project.description.isEmpty()
+                          ? project.description : 'No description provided.'}"
+               th:style="${project.description == null or project.description.isEmpty()}
+                          ? 'color:var(--text-muted); font-style:italic' : ''">
+                Description
+            </p>
+
+            <div style="display:flex; gap:.5rem; padding-top:.75rem;
+                        border-top:1px solid var(--border); flex-wrap:wrap;">
+                <a class="btn btn-ghost btn-sm"
+                   th:href="@{/user/projects/{id}/usecases(id=${project.id})}">
+                    Use Cases
+                </a>
+                <a class="btn btn-ghost btn-sm"
+                   th:href="@{/user/projects/{id}/crccards(id=${project.id})}">
+                    CRC Cards
+                </a>
+                <a class="btn btn-ghost btn-sm"
+                   th:href="@{/user/projects/{id}/diagrams(id=${project.id})}"
+                   style="color:var(--accent);">
+                    Diagrams
+                </a>
+                <a class="btn btn-ghost btn-sm"
+                   th:href="@{/user/projects/{id}/share(id=${project.id})}"
+                   style="color:var(--success);">
+                    Share
+                </a>
+                <a class="btn btn-ghost btn-sm"
+                   th:href="@{/user/projects/{id}/edit(id=${project.id})}">
+                    Edit
+                </a>
+                <a class="btn btn-danger btn-sm"
+                   th:href="@{/user/projects/{id}/delete(id=${project.id})}"
+                   onclick="return confirm('Delete this project and all its content?')">
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+      Shared with me section
+    --------------------------------------------------------------- -->
+    <div th:if="${sharedProjects != null and !#lists.isEmpty(sharedProjects)}">
+
+        <div class="page-header" style="margin-top:1rem;">
+            <h1 style="font-size:1.1rem;">Shared with me</h1>
+            <p>Projects that teammates have given you access to</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:1.25rem;">
+
+            <div class="card" th:each="project : ${sharedProjects}"
+                 style="display:flex; flex-direction:column; gap:1rem;
+                        border-color:rgba(62,207,142,0.3);">
+
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;">
+                    <div>
+                        <h3 style="font-family:var(--font-mono); font-size:1rem; font-weight:700;
+                                    color:var(--text-primary); letter-spacing:-.3px;"
+                            th:text="${project.name}">Project Name</h3>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:.2rem;"
+                           th:text="'Owner: ' + ${project.user.username}">Owner</p>
+                    </div>
+                    <span class="badge" style="background:rgba(62,207,142,0.12); color:var(--success);">
+                        shared
+                    </span>
+                </div>
+
+                <p style="font-size:.875rem; color:var(--text-secondary); flex:1; line-height:1.6;"
+                   th:text="${project.description != null and !project.description.isEmpty()
+                              ? project.description : 'No description provided.'}"
+                   th:style="${project.description == null or project.description.isEmpty()}
+                              ? 'color:var(--text-muted); font-style:italic' : ''">
+                    Description
+                </p>
+
+                <!-- Collaborators: content buttons only (no Edit/Delete/Share) -->
+                <div style="display:flex; gap:.5rem; padding-top:.75rem;
+                            border-top:1px solid var(--border); flex-wrap:wrap;">
+                    <a class="btn btn-ghost btn-sm"
+                       th:href="@{/user/projects/{id}/usecases(id=${project.id})}">
+                        Use Cases
+                    </a>
+                    <a class="btn btn-ghost btn-sm"
+                       th:href="@{/user/projects/{id}/crccards(id=${project.id})}">
+                        CRC Cards
+                    </a>
+                    <a class="btn btn-ghost btn-sm"
+                       th:href="@{/user/projects/{id}/diagrams(id=${project.id})}"
+                       style="color:var(--accent);">
+                        Diagrams
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:2.5rem;">
+        <a class="btn btn-ghost" th:href="@{/user/dashboard}">← Back to Dashboard</a>
+    </div>
+
+</div>
+</body>
+</html>

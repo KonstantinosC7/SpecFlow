@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<div class="page-container">
+
+    <!-- Welcome header -->
+    <div class="page-header">
+        <h1>Good to see you, <span th:text="${user.firstName}" style="color:var(--accent)">Developer</span></h1>
+        <p>Here's an overview of your workspace.</p>
+    </div>
+
+    <!-- Flash messages -->
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-bottom:2.5rem">
+
+        <div class="card" style="display:flex;flex-direction:column;gap:0.5rem">
+            <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600">Projects</span>
+            <span style="font-family:var(--font-mono);font-size:2.5rem;font-weight:700;color:var(--accent)" th:text="${projectCount}">0</span>
+            <a th:href="@{/user/projects}" style="font-size:0.8rem;color:var(--text-secondary);text-decoration:none;margin-top:.25rem">View all →</a>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;gap:0.5rem">
+            <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600">Account</span>
+            <span style="font-size:1rem;color:var(--text-primary);font-weight:500" th:text="${user.username}">username</span>
+            <a th:href="@{/user/profile}" style="font-size:0.8rem;color:var(--text-secondary);text-decoration:none;margin-top:.25rem">Edit profile →</a>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;gap:0.5rem">
+            <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600">Email</span>
+            <span style="font-size:0.9rem;color:var(--text-primary)" th:text="${user.email}">email</span>
+            <span style="font-size:0.8rem;color:var(--text-muted);margin-top:.25rem">Registered developer</span>
+        </div>
+
+    </div>
+
+    <!-- Quick actions -->
+    <div class="page-header">
+        <h1 style="font-size:1.1rem">Quick Actions</h1>
+    </div>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a class="btn btn-primary" th:href="@{/user/projects/new}">+ New Project</a>
+        <a class="btn btn-ghost" th:href="@{/user/projects}">View Projects</a>
+        <a class="btn btn-ghost" th:href="@{/user/profile}">Edit Profile</a>
+    </div>
+
+</div>
+</body>
+</html>
