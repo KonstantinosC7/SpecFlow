@@ -17,7 +17,7 @@
 - [Architecture](#-architecture)
 - [Design Patterns](#-design-patterns)
 - [Technologies](#-technologies)
--  [Screenshots](#️-screenshots)
+- [Screenshots](#️-screenshots)
 
 ---
 
@@ -92,10 +92,10 @@ The platform leverages a robust tech stack to ensure high performance and securi
   </tr>
   <tr>
     <td align="center">
-      <img src="images/1-project-list.png" alt="Project List Screen" width="100%"/>
+      <img src="images/1_project-list.png" alt="Project List Screen" width="100%"/>
     </td>
     <td align="center">
-      <img src="images/2-generate-diagrams.png" alt="Diagram Generation Screen" width="100%"/>
+      <img src="images/2_generate-diagrams.png" alt="Diagram Generation Screen" width="100%"/>
     </td>
   </tr>
   <tr>
